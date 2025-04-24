@@ -73,6 +73,8 @@ You can also search the listings from an interactive map.
 https://github.com/user-attachments/assets/35b83d23-89b7-45b2-8612-e318cef822da
 
 
-
+Thank you for exploring the Airbnb Clone iOS app! This project is designed to provide a user-friendly experience while simulating core features of the Airbnb platform.
+Feel free to explore the code, contribute, or open issues if you find any bugs or have suggestions for improvements. If you found this project helpful or interesting, consider starring the repository or sharing it with others!
+Happy coding!
 
 
