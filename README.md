@@ -40,7 +40,6 @@ The app lets you save listings you like to your wishlist. If you remove a listin
 You can add or remove listings from your wishlist directly from the listing details view or from the preview in the listings list.
 
 ![save detail](https://github.com/user-attachments/assets/bc65b91b-3930-4f66-8886-68fcb82d481d)
-
 ![save item](https://github.com/user-attachments/assets/8371a112-23ae-485d-a56d-571b92ae4037)
 
 
