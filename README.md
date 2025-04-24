@@ -10,13 +10,11 @@ This project was developed as a learning experience. Feel free to explore the co
 
 You can update your check-in and check-out dates and guest number at any time. The app will prevent you from selecting unavailable dates or entering a number of guests that exceeds the listing’s limit.
 
+![Guest selection](https://github.com/user-attachments/assets/77663e85-4ce9-4247-bfc6-3f0557358b03)
+![Date selection](https://github.com/user-attachments/assets/cd67e3b3-4bf4-4f93-93ce-69efea3ad634)
 
 
-https://github.com/user-attachments/assets/399257f5-2530-4c86-9501-1f091475f1ab
 
-
-
-https://github.com/user-attachments/assets/8c12136d-b21f-4435-a3fb-29382e971376
 
 The app provides a detailed view of each listing, including its features, location, host information, reviews, pricing, and payment options
 
