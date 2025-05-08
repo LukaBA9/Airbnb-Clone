@@ -10,41 +10,14 @@ import UIKit
 import HorizonCalendar
 
 struct DestinationSearchView: View {
-    enum DestinationSearchOptions: Int, CaseIterable {
-        case location
-        case dates
-        case guests
-        
-        var id : Int {
-            rawValue
-        }
-    }
     
     @Binding var show: Bool
-    @State private var destinationText: String = ""
-    @State private var selectedOption: DestinationSearchOptions = .location
     
     @FocusState private var isFocused: Bool
     
     @EnvironmentObject var exploreViewModel: ExploreViewModel
     
-    @State private var temporarySearchFilter: (location: City?, checkInDate: Date?, checkOutDate: Date?, guests: (adults: Int, children: Int, infants: Int, pets: Int)) = (nil, nil, nil, (0, 0, 0, 0))
-    
-    var filteredSearchSuggestions: [City] {
-        DeveloperPreview.shared.cities.filter { city in
-            (city.cityName.lowercased().contains(destinationText.lowercased()) || city.country.rawValue.lowercased().contains(destinationText.lowercased()))
-        }
-    }
-    
-    var suggestedDestinations: [City] {
-        DeveloperPreview.shared.cities.filter { city in
-            city.country == .unitedStates
-        }
-    }
-    
-    var numberOfGuests: Int {
-        return temporarySearchFilter.guests.adults + temporarySearchFilter.guests.children + temporarySearchFilter.guests.pets + temporarySearchFilter.guests.infants
-    }
+    @StateObject var viewModel: DestinationSearchViewModel = .init()
     
     var body: some View {
         VStack(spacing: 0) {
@@ -59,7 +32,7 @@ struct DestinationSearchView: View {
                 }
                 Spacer()
                 
-                if !destinationText.isEmpty {
+                if !viewModel.destinationText.isEmpty {
                     clearButton
                 }
             }
@@ -71,10 +44,10 @@ struct DestinationSearchView: View {
             .padding(.bottom, isFocused ? -350 : 12)
             .onTapGesture {
                 withAnimation(.snappy(duration: 0.3)) {
-                    selectedOption = .location
+                    viewModel.selectedOption = .location
                 }
             }
-            .frame(height: selectedOption == .location ? 400 : 81)
+            .frame(height: viewModel.selectedOption == .location ? 400 : 81)
             
             datesPicker
             .zIndex(-1)
@@ -82,10 +55,10 @@ struct DestinationSearchView: View {
             .padding()
             .onTapGesture {
                 withAnimation(.snappy(duration: 0.3)) {
-                    selectedOption = .dates
+                    viewModel.selectedOption = .dates
                 }
             }
-            .frame(height: selectedOption == .dates ? 400 : 81)
+            .frame(height: viewModel.selectedOption == .dates ? 400 : 81)
             
             guestPicker
             .zIndex(-1)
@@ -93,10 +66,10 @@ struct DestinationSearchView: View {
             .padding()
             .onTapGesture {
                 withAnimation(.snappy(duration: 0.3)) {
-                    selectedOption = .guests
+                    viewModel.selectedOption = .guests
                 }
             }
-            .frame(height: selectedOption == .guests ? 400 : 81)
+            .frame(height: viewModel.selectedOption == .guests ? 400 : 81)
             //Clear all-reset-skip - Search-Next buttons
             Spacer()
             HStack {
@@ -110,30 +83,9 @@ struct DestinationSearchView: View {
             .padding()
         }
         .onAppear() {
-            temporarySearchFilter.location = exploreViewModel.location
-            temporarySearchFilter.checkInDate = exploreViewModel.startDate
-            temporarySearchFilter.checkOutDate = exploreViewModel.endDate
-            temporarySearchFilter.guests = exploreViewModel.guests
+            viewModel.assignTemporarySearchFilter(location: exploreViewModel.location, checkInDate: exploreViewModel.startDate, checkOutDate: exploreViewModel.endDate, guests: exploreViewModel.guests)
         }
         .animation(.snappy(duration: 0.3), value: isFocused)
-    }
-    
-    private func showExploreView() {
-        if selectedOption.id % (DestinationSearchOptions.allCases.count - 1) == 0 {
-            exploreViewModel.location = temporarySearchFilter.location
-            exploreViewModel.guests = temporarySearchFilter.guests
-            let city = temporarySearchFilter.location
-            let longitude = city?.longitude ?? 0.0
-            let latitude = city?.latitude ?? 0.0
-            exploreViewModel.cameraPosition = .region(.init(center: .init(latitude: latitude, longitude: longitude), span: .init(latitudeDelta: 0.1, longitudeDelta: 0.1)))
-            withAnimation(.snappy(duration: 0.3)) { show.toggle() }
-            guard let checkInDate = temporarySearchFilter.checkInDate, let checkOutDate = temporarySearchFilter.checkOutDate else { return }
-            exploreViewModel.startDate = checkInDate
-            exploreViewModel.endDate = checkOutDate
-            exploreViewModel.fetchListings()
-        } else {
-            withAnimation(.snappy(duration: 0.3)) { selectedOption = DestinationSearchOptions(rawValue: selectedOption.id + 1)! }
-        }
     }
     
     private var xButton: some View {
@@ -151,7 +103,7 @@ struct DestinationSearchView: View {
     private var backButton: some View {
         Button {
             withAnimation(.snappy) {
-                destinationText = ""
+                viewModel.destinationText = ""
                 isFocused = false
             }
         } label: {
@@ -163,7 +115,7 @@ struct DestinationSearchView: View {
     
     private var clearButton: some View {
         Button {
-            destinationText = ""
+            viewModel.destinationText = ""
         } label: {
             Text("Clear")
                 .foregroundStyle(.black)
@@ -174,7 +126,7 @@ struct DestinationSearchView: View {
     
     private var locationPicker: some View {
         VStack(alignment: .leading, spacing: 24) {
-            if selectedOption == .location {
+            if viewModel.selectedOption == .location {
                 if !isFocused {
                     Text("Where to?")
                         .font(.title2)
@@ -186,7 +138,7 @@ struct DestinationSearchView: View {
                     Image(systemName: "magnifyingglass")
                         .imageScale(.small)
                     
-                    TextField("Search destinations", text: $destinationText)
+                    TextField("Search destinations", text: $viewModel.destinationText)
                         .font(.subheadline)
                         .focused($isFocused)
                 }
@@ -201,42 +153,42 @@ struct DestinationSearchView: View {
                 //Search suggestions
                 ScrollView (showsIndicators: false) {
                     VStack(alignment: .leading) {
-                        ForEach(destinationText.isEmpty ? suggestedDestinations : filteredSearchSuggestions) { city in
+                        ForEach(viewModel.destinationText.isEmpty ? viewModel.suggestedDestinations : viewModel.filteredSearchSuggestions) { city in
                             CitySearchResultView(city: city, action: {
-                                temporarySearchFilter.location = city
-                                withAnimation(.snappy(duration: 0.3)) { selectedOption = .dates }
+                                viewModel.temporarySearchFilter.location = city
+                                withAnimation(.snappy(duration: 0.3)) { viewModel.selectedOption = .dates }
                                 isFocused = false
                             })
                         }
                     }
                 }
             } else {
-                CollapsedPickerView(title: "Where", description: temporarySearchFilter.location == nil ? "Add destination" : "\(temporarySearchFilter.location!.cityName)\(temporarySearchFilter.location!.state != nil ? ", \(temporarySearchFilter.location!.state?.rawValue ?? "")" : ""), \(temporarySearchFilter.location!.country.rawValue)")
+                CollapsedPickerView(title: "Where", description: viewModel.temporarySearchFilter.location == nil ? "Add destination" : "\(viewModel.temporarySearchFilter.location!.cityName)\(viewModel.temporarySearchFilter.location!.state != nil ? ", \(viewModel.temporarySearchFilter.location!.state?.rawValue ?? "")" : ""), \(viewModel.temporarySearchFilter.location!.country.rawValue)")
             }
         }
     }
     
     private var datesPicker: some View {
         VStack(alignment: .leading) {
-            if selectedOption == .dates {
+            if viewModel.selectedOption == .dates {
                 Text("When's your trip?")
                     .font(.title2)
                     .fontWeight(.semibold)
                 //Calendar
-                CalendarPicker(checkInDate: $temporarySearchFilter.checkInDate, checkOutDate: $temporarySearchFilter.checkOutDate)
+                CalendarPicker(checkInDate: $viewModel.temporarySearchFilter.checkInDate, checkOutDate: $viewModel.temporarySearchFilter.checkOutDate)
             } else {
-                CollapsedPickerView(title: "When", description: temporarySearchFilter.checkInDate == nil || temporarySearchFilter.checkOutDate == nil ? "Add dates" : exploreViewModel.dateRangeDescription)
+                CollapsedPickerView(title: "When", description: viewModel.temporarySearchFilter.checkInDate == nil || viewModel.temporarySearchFilter.checkOutDate == nil ? "Add dates" : exploreViewModel.dateRangeDescription)
             }
         }
     }
     
     private var guestPicker: some View {
         VStack(alignment: .leading) {
-            if selectedOption == .guests {
-                GuestSelectionView(temporarySearchFilter: $temporarySearchFilter.guests)
+            if viewModel.selectedOption == .guests {
+                GuestSelectionView(temporarySearchFilter: $viewModel.temporarySearchFilter.guests)
 
             } else {
-                CollapsedPickerView(title: "Who", description: numberOfGuests == 0 ? "Add guests" : "\(numberOfGuests) \(numberOfGuests == 1 ? "guest" : "guests")")
+                CollapsedPickerView(title: "Who", description: viewModel.numberOfGuests == 0 ? "Add guests" : "\(viewModel.numberOfGuests) \(viewModel.numberOfGuests == 1 ? "guest" : "guests")")
             }
         }
     }
@@ -253,20 +205,30 @@ struct DestinationSearchView: View {
     
     private var searchButton: some View {
         Button {
-            showExploreView()
+            viewModel.showExploreView { location, checkInDate, checkOutDate, guests in
+                exploreViewModel.updateSearchFilters(location: location, checkInDate: checkInDate, checkOutDate: checkOutDate, guests: guests)
+            } updateCameraPosition: { latitude, longitude in
+                exploreViewModel.updateCameraPosition(latitude: latitude, longitude: longitude)
+            } fetchListings: {
+                exploreViewModel.fetchListings()
+            } show: {
+                withAnimation(.snappy(duration: 0.3)) { show.toggle() }
+            } updateSelectedOption: {
+                withAnimation(.snappy(duration: 0.3)) { viewModel.selectedOption = DestinationSearchViewModel.DestinationSearchOptions(rawValue: viewModel.selectedOption.id + 1)! }
+            }
         } label: {
             HStack {
-                if selectedOption.id == 0 || selectedOption.id == DestinationSearchOptions.allCases.count - 1 {
+                if viewModel.selectedOption.id == 0 || viewModel.selectedOption.id == DestinationSearchViewModel.DestinationSearchOptions.allCases.count - 1 {
                     Image(systemName: "magnifyingglass")
                 }
-                Text(selectedOption.id == 0 || selectedOption.id == DestinationSearchOptions.allCases.count - 1 ? "Search" : "Next")
+                Text(viewModel.selectedOption.id == 0 || viewModel.selectedOption.id == DestinationSearchViewModel.DestinationSearchOptions.allCases.count - 1 ? "Search" : "Next")
             }
             .fontWeight(.bold)
             .foregroundStyle(.white)
             .frame(width: 132, height: 55)
-            .background(selectedOption.id != 0 && selectedOption.id != DestinationSearchOptions.allCases.count - 1 ? .black : temporarySearchFilter.location == nil ? .pink.opacity(0.5) : .pink, in: RoundedRectangle(cornerRadius: 6))
+            .background(viewModel.selectedOption.id != 0 && viewModel.selectedOption.id != DestinationSearchViewModel.DestinationSearchOptions.allCases.count - 1 ? .black : viewModel.temporarySearchFilter.location == nil ? .pink.opacity(0.5) : .pink, in: RoundedRectangle(cornerRadius: 6))
         }
-        .disabled(temporarySearchFilter.location == nil && (selectedOption.id == 0 || selectedOption.id == DestinationSearchOptions.allCases.count - 1))
+        .disabled(viewModel.temporarySearchFilter.location == nil && (viewModel.selectedOption.id == 0 || viewModel.selectedOption.id == DestinationSearchViewModel.DestinationSearchOptions.allCases.count - 1))
     }
 }
 
@@ -280,8 +242,6 @@ struct CollapsableDestinationViewModifier: ViewModifier {
             .shadow(radius: 10)
     }
 }
-
-
 
 #Preview {
     MainTabView()

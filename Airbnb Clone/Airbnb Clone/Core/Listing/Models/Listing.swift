@@ -39,6 +39,17 @@ struct Listing: Identifiable, Codable, Hashable {
     var amenities: [Int]
     
     let type: Int
+    
+    var bookedDatesFromToday: [TimeInterval] {
+        var dates: [TimeInterval] = []
+        let currDate = Date().timeIntervalSince1970
+        for date in self.bookedDates {
+            if currDate < date {
+                dates.append(date)
+            }
+        }
+        return dates
+    }
 }
 
 enum ListingFeatures: Int, Codable, Identifiable, Hashable {

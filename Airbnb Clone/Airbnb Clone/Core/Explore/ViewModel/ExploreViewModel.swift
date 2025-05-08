@@ -14,7 +14,6 @@ class ExploreViewModel: ObservableObject {
     
     @Published var listingReviews: [Review] = []
     @Published private var currentListing: Listing? = nil
-    //@Published var currentListingRating: Double = 0
     
     @Published var listingRatings: [String : Double] = [:]
     
@@ -23,7 +22,6 @@ class ExploreViewModel: ObservableObject {
     @Published var wishlistListings: [String] = []
     
     @Published var rating: Double = 0
-    //@Published var isSaved: Bool = false
     
     @Published var cameraPosition: MapCameraPosition
     
@@ -37,6 +35,8 @@ class ExploreViewModel: ObservableObject {
     @Published var startDate: Date?
     @Published var endDate: Date? {
         didSet {
+            //Everytime the endDate is updated, that means that the startDate is also updated,
+            //which means that the date interval needs recalculation
             guard let endDate = endDate, let startDate = startDate else { return }
             selectedDateInterval = (endDate.timeIntervalSince(startDate)) / 86_400
         }
@@ -45,10 +45,12 @@ class ExploreViewModel: ObservableObject {
     @Published var guests: (adults: Int, children: Int, infants: Int, pets: Int) = (1, 0, 0, 0)
     
     var dateRangeDescription: String {
+        //This is the human-readable format of a date range the user selected. Example: May 12 - 18, May 31 - June 03
         return "\(Global.main.getMonthName(from: Calendar.current.component(.month, from: startDate!))) \(Calendar.current.component(.day, from: startDate!)) - \(Calendar.current.component(.month, from: startDate!) == Calendar.current.component(.month, from: endDate!) ? Calendar.current.component(.day, from: endDate!).description : Global.main.getMonthName(from: Calendar.current.component(.month, from: endDate!)) + " " + Calendar.current.component(.day, from: endDate!).description)"
     }
     
     init() {
+        //This is not affecting the map view. The compiler requires the cameraPosition to be initialised, but the exploreView can never be accessed before the user selects the location where he wants to book accomodations
         self._cameraPosition = Published(initialValue: .region(.init(center: .init(), span: .init())))
         
         startDate = Date()
@@ -129,34 +131,21 @@ class ExploreViewModel: ObservableObject {
     }
     
     public func totalPrice() -> Double {
+        //Total price is calculated by multiplying the date interval with the price per night of the listing
         guard let currentListing = self.listing else { return 0 }
         return currentListing.pricePerNight * (endDate!.timeIntervalSince(startDate!) / 86_400)
     }
     
     public func getListingReviews(listing: Listing) {
         Task {
-            //Make sure that the listing that requested the rating calculation is different from the one that is in memory
-            //guard self.currentListing != listing else { return }
-            
             //Go to the main thread before publishing the changes
             await MainActor.run {
-                //Reset the rating for the listing
-                //listingRatings[listing.id] = 0
-                
-                //Update the listing in memory
-                //self.currentListing = listing
                 
                 //Reset all reviews
                 self.listingReviews.removeAll()
             }
             
             await fetchListingReviews(listing: listing)
-            //calculate rating
-            //guard !listingReviews.isEmpty else { return }
-//            await MainActor.run {
-//                //Calculate the average
-//                //listingRatings[listing.id]! /= Double(listingReviews.count)
-//            }
         }
     }
     
@@ -183,5 +172,18 @@ class ExploreViewModel: ObservableObject {
         wishlistListings.removeAll { listingId in
             listingId == listing.id
         }
+    }
+    
+    public func updateCameraPosition(latitude: Double, longitude: Double) {
+        //This method updates the center position of the camera for the map view whenever the location is updated
+        cameraPosition = .region(.init(center: .init(latitude: latitude, longitude: longitude), span: .init(latitudeDelta: 0.1, longitudeDelta: 0.1)))
+    }
+    
+    public func updateSearchFilters(location: City?, checkInDate: Date?, checkOutDate: Date?, guests: (adults: Int, children: Int, infants: Int, pets: Int)) {
+        //When the user updates the search filters, the new settings are stored in temporary variables, so they wouldn't affect the actual data if the user desides to quit. When the user presses search button, this method is called, updating the data.
+        self.location = location
+        self.guests = guests
+        self.startDate = checkInDate
+        self.endDate = checkOutDate
     }
 }

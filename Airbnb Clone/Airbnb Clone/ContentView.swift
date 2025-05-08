@@ -15,7 +15,6 @@ struct ContentView: View {
         MainTabView()
     }
 }
-
 #Preview {
     ContentView()
         .environmentObject(MainViewModel())

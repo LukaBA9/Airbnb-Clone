@@ -23,6 +23,8 @@ struct CalendarPicker: View {
     
     @State private var dateRangeToHighlight: ClosedRange<Date>? = nil
     
+    @State private var currIntervalLowerBound: Int = 0
+    
     @Binding var checkInDate: Date?
     @Binding var checkOutDate: Date?
     
@@ -40,22 +42,20 @@ struct CalendarPicker: View {
             dataDependency: nil
         )
         .days { day in
+            
             let date = calendar.date(from: day.components)
             Text("\(day.day)")
               .font(.system(size: 18))
-              .foregroundColor(datesToHighlight.contains(where: { id in
-                  Calendar.current.dateComponents([.year, .month, .day], from: id) == Calendar.current.dateComponents([.year, .month, .day], from: date!)
-              }) ? .white : .black)
+              .foregroundColor(isDateAvailable(date: date!) ? (isDateSelected(date!) ? .white : .black) : .gray)
               .frame(maxWidth: .infinity, maxHeight: .infinity)
-              .background(datesToHighlight.contains(where: { id in
-                  Calendar.current.dateComponents([.year, .month, .day], from: id) == Calendar.current.dateComponents([.year, .month, .day], from: date!)
-              }) ? .black.opacity(0.9) : .clear, in: Circle())
-          }
+              .background(isDateSelected(date!) ? .black.opacity(0.9) : .clear, in: Circle())
+        }
         .onDaySelection { day in
-            selectedDate = calendar.date(from: day.components)
-            if startDate != nil, selectedDate! > startDate!, endDate == nil {
+            guard let selectedDate = calendar.date(from: day.components) else { return }
+            guard isDateAvailable(date: selectedDate) else { return }
+            if startDate != nil, selectedDate > startDate!, endDate == nil {
                 endDate = selectedDate
-                datesToHighlight.append(selectedDate!)
+                datesToHighlight.append(selectedDate)
                 dateRangeToHighlight = startDate!...endDate!
                 checkInDate = startDate!
                 checkOutDate = endDate!
@@ -64,7 +64,7 @@ struct CalendarPicker: View {
             startDate = selectedDate
             endDate = nil
             datesToHighlight.removeAll()
-            datesToHighlight.append(selectedDate!)
+            datesToHighlight.append(selectedDate)
             dateRangeToHighlight = nil
             return
           }
@@ -80,70 +80,51 @@ struct CalendarPicker: View {
         .onAppear() {
             datesToHighlight.append(contentsOf: [exploreViewModel.startDate!, exploreViewModel.endDate!])
             dateRangeToHighlight = exploreViewModel.startDate!...exploreViewModel.endDate!
-            print(datesToHighlight.first!.description)
         }
     }
+    
+    private func isDateSelected(_ date: Date) -> Bool {
+        datesToHighlight.contains(where: { id in
+            Calendar.current.dateComponents([.year, .month, .day], from: id) == Calendar.current.dateComponents([.year, .month, .day], from: date)
+        }) ? true : false
+    }
+    
+    private func isDateAvailable(date: Date) -> Bool {
+        //check for whether or not the listing is nil
+        //if it isnt, then make sure to not allow selection of any dates that are already booked
+        //when the start date is selected, make sure to not allow selection of any dates that are after the lower-bound of the first interval after the start date.
+        //if there arent any bookedDates intervals after the start date, allow all the dates after
+        
+        guard exploreViewModel.listing != nil else { //logic for when the listing isnt choosen
+            return Date().smallerThan(date)
+        }
+        
+        //logic for when the the dates are being edited from the reserve view
+        
+        let dateUNIX = date.timeIntervalSince1970
+        
+        for i in stride(from: 0, to: exploreViewModel.listing!.bookedDates.count, by: 2) {
+            let bookedDateLowerBound = exploreViewModel.listing!.bookedDates[i]
+            let bookedDateUpperBound = exploreViewModel.listing!.bookedDates[i + 1]
+            
+            if dateUNIX >= bookedDateLowerBound && dateUNIX < bookedDateUpperBound {
+                return false
+            }
+            
+            if self.startDate != nil && self.endDate == nil {
+                if self.startDate!.timeIntervalSince1970 < bookedDateUpperBound && dateUNIX >= bookedDateLowerBound {
+                    return false
+                }
+            }
+        }
+        
+        return Date().smallerThan(date)
+    }
 }
 
-final class DayRangeIndicatorView: UIView {
 
-  private let indicatorColor: UIColor
 
-  init(indicatorColor: UIColor) {
-    self.indicatorColor = indicatorColor
-    super.init(frame: .zero)
-    backgroundColor = .clear
-  }
 
-  required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
-
-  var framesOfDaysToHighlight = [CGRect]() {
-    didSet {
-      guard framesOfDaysToHighlight != oldValue else { return }
-      setNeedsDisplay()
-    }
-  }
-
-  override func draw(_ rect: CGRect) {
-    let context = UIGraphicsGetCurrentContext()
-    context?.setFillColor(indicatorColor.cgColor)
-
-    // Get frames of day rows in the range
-    var dayRowFrames = [CGRect]()
-    var currentDayRowMinY: CGFloat?
-    for dayFrame in framesOfDaysToHighlight {
-      if dayFrame.minY != currentDayRowMinY {
-        currentDayRowMinY = dayFrame.minY
-        dayRowFrames.append(dayFrame)
-      } else {
-        let lastIndex = dayRowFrames.count - 1
-        dayRowFrames[lastIndex] = dayRowFrames[lastIndex].union(dayFrame)
-      }
-    }
-
-    // Draw rounded rectangles for each day row
-    for dayRowFrame in dayRowFrames {
-      let roundedRectanglePath = UIBezierPath(roundedRect: dayRowFrame, cornerRadius: 12)
-      context?.addPath(roundedRectanglePath.cgPath)
-      context?.fillPath()
-    }
-  }
-
-}
-
-struct DayRangeIndicatorViewRepresentable: UIViewRepresentable {
-
-  let framesOfDaysToHighlight: [CGRect]
-
-  func makeUIView(context: Context) -> DayRangeIndicatorView {
-    DayRangeIndicatorView(indicatorColor: UIColor.systemBlue.withAlphaComponent(0.15))
-  }
-
-  func updateUIView(_ uiView: DayRangeIndicatorView, context: Context) {
-    uiView.framesOfDaysToHighlight = framesOfDaysToHighlight
-  }
-
-}
 
 #Preview {
     CalendarPicker(checkInDate: .constant(Date()), checkOutDate: .constant(Date()))

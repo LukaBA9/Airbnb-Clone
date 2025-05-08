@@ -58,30 +58,6 @@ struct ListingDetailView: View {
                             }
                             
                             Spacer()
-                            
-//                            Button {
-//                                //save button
-//                                guard let user = Global.main.currentUser else {
-//                                    //no user
-//                                    return
-//                                }
-//                                if !user.wishlist.contains(where: { id in
-//                                    id == listing.id
-//                                }) {
-//                                    //add
-//                                    exploreViewModel.addToWishlist(listing)
-//                                } else {
-//                                    exploreViewModel.removeFromWishlist(listing)
-//                                }
-//                            } label: {
-//                                Image(systemName: exploreViewModel.isSaved ? "heart.fill" : "heart")
-//                                    .foregroundStyle(exploreViewModel.isSaved ? .pink : .black)
-//                                    .background {
-//                                        Circle()
-//                                            .fill(.white)
-//                                            .frame(width: 32, height: 32)
-//                                    }
-//                            }
                             SaveButton(listing: listing)
                         }
                         .padding(.horizontal, 27)

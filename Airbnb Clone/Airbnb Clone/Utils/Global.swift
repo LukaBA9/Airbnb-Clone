@@ -9,12 +9,15 @@ import Foundation
 import FirebaseFirestore
 
 class Global {
+    
     static let main: Global = .init()
+    
     public var currentUser: User? = nil {
         didSet {
             updateUserData()
         }
     }
+    
     public var today: (year: Int, month: Int, day: Int) = (
         year: Calendar.current.component(.year, from: Date()),
         month: Calendar.current.component(.month, from: Date()),

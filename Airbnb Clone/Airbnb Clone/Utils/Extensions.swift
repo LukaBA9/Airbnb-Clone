@@ -9,7 +9,15 @@ import Foundation
 import SwiftUI
 import FirebaseFirestore
 
-extension Sheet {
+extension Date {
+    func smallerThan(_ date: Date) -> Bool {
+        let calendar = Calendar.current
+        let nowComponents = calendar.dateComponents([.day, .month, .year], from: Date())
+        return calendar.date(from: nowComponents)!.timeIntervalSince1970 <= date.timeIntervalSince1970
+    }
+}
+
+extension CustomSheet {
     mutating func hide(_ condition: Bool, value: CGFloat) {
         if condition {
             offset += value
@@ -41,20 +49,6 @@ extension [Review] {
         return (sum / Double(self.count))
     }
 }
-
-//struct Decode<T: Decodable> {
-//    static func decodeDocument(collectionPath: String, documentId: String) async throws -> T {
-//        let db = Firestore.firestore()
-//        do {
-//            let data = try await db.collection(collectionPath)
-//                .document(documentId)
-//                .getDocument(as: T.self)
-//            return data
-//        } catch let error {
-//            throw error
-//        }
-//    }
-//}
 
 
 

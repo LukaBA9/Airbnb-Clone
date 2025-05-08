@@ -9,7 +9,7 @@
 import SwiftUI
 import MapKit
 
-struct CustomSheet<Content: View>: View, Sheet {
+struct CustomSheet<Content: View>: View {
     
     let content: Content
     @State internal var offset: CGFloat
