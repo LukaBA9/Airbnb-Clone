@@ -1,5 +1,5 @@
 # Airbnb-Clone
- Welcome to the Airbnb Clone iOS App! This is a fully functional clone of the Airbnb mobile experience, built with Swift and SwiftUI. The app replicates key features of the Airbnb platform, such as property listings, user authentication, detailed property views, and booking functionality.
+ Welcome to the Airbnb Clone iOS App, built with Swift and SwiftUI. The app replicates key features of the Airbnb platform, such as property listings, user authentication, detailed property views, and booking functionality.
 Tech Stack & Features:
 SwiftUI for a modern, declarative UI.
 Firebase for backend services, including database, authentication, and storage.
