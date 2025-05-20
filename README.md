@@ -7,63 +7,48 @@ MVVM Architecture to ensure a clean separation of concerns, making the codebase 
 Swift Concurrency (async/await) for smooth, efficient handling of asynchronous operations.
 This project was developed as a learning experience. Feel free to explore the codebase, fork the project, or contribute!
 
+The app greets you with the beautiful screen where you will be asked to give the neccesary info about your stay.
+![Simulator Screenshot - iPhone 16 Pro - 2025-05-20 at 23 06 24](https://github.com/user-attachments/assets/5ff325c1-07e4-43c8-93d1-6ae8dfcd25e5)
+![Simulator Screenshot - iPhone 16 Pro - 2025-05-20 at 23 07 08](https://github.com/user-attachments/assets/b86d9716-c064-4cdc-8304-9af36e51657b)
+![Simulator Screenshot - iPhone 16 Pro - 2025-05-20 at 23 07 24](https://github.com/user-attachments/assets/5c0b2cbf-7c58-4884-8684-8e7e00e73bc9)
+![Simulator Screenshot - iPhone 16 Pro - 2025-05-20 at 23 07 31](https://github.com/user-attachments/assets/79562549-4da7-44c3-a10c-ecdca751c516)
+
+When you apply your search criteria and initiate the search, a list of listings will appear, displaying key information about each one.
+
+![Simulator Screenshot - iPhone 16 Pro - 2025-05-20 at 23 07 40](https://github.com/user-attachments/assets/deb05e87-ccbb-437b-809f-fe9cd85dc2f9)
+
+
 
 You can update your check-in and check-out dates and guest number at any time. The app will prevent you from selecting unavailable dates or entering a number of guests that exceeds the listing’s limit.
 
 
-![Date selection](https://github.com/user-attachments/assets/6639eacd-7ccb-4e91-b860-dce07ae3689a)
-![Guest selection](https://github.com/user-attachments/assets/f414ad7f-9d49-4da6-828e-6b514e402e55)
-
-
+![Simulator Screenshot - iPhone 16 Pro - 2025-05-20 at 23 08 23](https://github.com/user-attachments/assets/368dbd12-39af-4ab0-9f78-112c30d922e3)
+![Simulator Screenshot - iPhone 16 Pro - 2025-05-20 at 23 08 28](https://github.com/user-attachments/assets/730efec4-7117-42b6-8363-d1da64120ac4)
 
 
 The app provides a detailed view of each listing, including its features, location, host information, reviews, pricing, and payment options
 
-![Listing Detail and reserve view (1)](https://github.com/user-attachments/assets/ea32aeab-bdb0-4022-b8e2-c5a0209f484b)
 
-
-
-
-You can filter listings by location, travel dates, and number of guests to quickly find places that match your needs.
-
-
-![Location search](https://github.com/user-attachments/assets/93ffb086-d947-403f-bf88-9d45883e1ff2)
-
-
+![Simulator Screenshot - iPhone 16 Pro - 2025-05-20 at 23 07 48](https://github.com/user-attachments/assets/514a6967-97d0-4216-9576-d2f393fc82fc)
+![Simulator Screenshot - iPhone 16 Pro - 2025-05-20 at 23 07 53](https://github.com/user-attachments/assets/ef09be59-0351-40a9-963b-6050ae429df8)
+![Simulator Screenshot - iPhone 16 Pro - 2025-05-20 at 23 08 11](https://github.com/user-attachments/assets/b8ce588f-2633-47a2-b21e-1f4ce145e029)
+![Simulator Screenshot - iPhone 16 Pro - 2025-05-20 at 23 08 16](https://github.com/user-attachments/assets/afb213ad-3c1c-42fd-a22e-5cff4dcdbfac)
 
 The app lets you save listings you like to your wishlist. If you remove a listing, it won’t be deleted right away—instead, it stays visible until the wishlist view is reloaded, giving you a chance to change your mind. This behavior mimics how the official Airbnb app handles wishlists.
 
-![wishlist](https://github.com/user-attachments/assets/c44c8320-c2e9-4ee6-8042-ffef2240e305)
-
-
+![Simulator Screenshot - iPhone 16 Pro - 2025-05-20 at 23 07 45](https://github.com/user-attachments/assets/fad2998a-187f-4bdd-9454-287dde527cbd)
 
 You can add or remove listings from your wishlist directly from the listing details view or from the preview in the listings list.
 
-![save detail](https://github.com/user-attachments/assets/bc65b91b-3930-4f66-8886-68fcb82d481d)
-![save item](https://github.com/user-attachments/assets/8371a112-23ae-485d-a56d-571b92ae4037)
-
-
-
-When you apply your search criteria and initiate the search, a list of listings will appear, displaying key information about each one.
-
-
-![ExploreView](https://github.com/user-attachments/assets/8195851d-1bf6-46e3-8776-cdf6a6b5f9d8)
-
-
-
-
 The app displays the listing’s average rating, along with detailed reviews from other users, and a graph showing the distribution of star ratings.
 
-
-![Reviews demo](https://github.com/user-attachments/assets/8ec0d5f9-3856-4f08-bc8c-ab486cc32ea0)
-
-
+![Simulator Screenshot - iPhone 16 Pro - 2025-05-20 at 23 07 57](https://github.com/user-attachments/assets/819b2ff7-cb30-4240-9b91-8f80a5e61e48)
+![Simulator Screenshot - iPhone 16 Pro - 2025-05-20 at 23 08 05](https://github.com/user-attachments/assets/be67f0ee-21bf-4cee-9f7d-be64200a4797)
 
 You can also search the listings from an interactive map.
 
-
-![Map View](https://github.com/user-attachments/assets/15fc1aae-784b-4603-8599-a1c4da0d50fd)
-
+![Simulator Screenshot - iPhone 16 Pro - 2025-05-20 at 23 08 47](https://github.com/user-attachments/assets/24156773-25c1-4be8-b2fc-5d7150356dc0)
+![Simulator Screenshot - iPhone 16 Pro - 2025-05-20 at 23 08 53](https://github.com/user-attachments/assets/84e370a9-7622-4c46-8027-4d6930241ae0)
 
 Thank you for exploring the Airbnb Clone iOS app! This project is designed to provide a user-friendly experience while simulating core features of the Airbnb platform.
 Feel free to explore the code, contribute, or open issues if you find any bugs or have suggestions for improvements. If you found this project helpful or interesting, consider starring the repository or sharing it with others!
