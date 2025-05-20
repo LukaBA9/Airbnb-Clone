@@ -8,7 +8,7 @@ Swift Concurrency (async/await) for smooth, efficient handling of asynchronous o
 This project was developed as a learning experience. Feel free to explore the codebase, fork the project, or contribute!
 
 The app greets you with the beautiful screen where you will be asked to give the neccesary info about your stay.
-![Simulator Screenshot - iPhone 16 Pro - 2025-05-20 at 23 06 24](https://github.com/user-attachments/assets/5ff325c1-07e4-43c8-93d1-6ae8dfcd25e5)
+![Simulator Screenshot - iPhone 16 Pro - 2025-05-20 at 23 06 24](https://github.com/user-attachments/assets/0c747337-cece-4d7f-bde5-f7b4a9e0c579)
 ![Simulator Screenshot - iPhone 16 Pro - 2025-05-20 at 23 07 08](https://github.com/user-attachments/assets/b86d9716-c064-4cdc-8304-9af36e51657b)
 ![Simulator Screenshot - iPhone 16 Pro - 2025-05-20 at 23 07 24](https://github.com/user-attachments/assets/5c0b2cbf-7c58-4884-8684-8e7e00e73bc9)
 ![Simulator Screenshot - iPhone 16 Pro - 2025-05-20 at 23 07 31](https://github.com/user-attachments/assets/79562549-4da7-44c3-a10c-ecdca751c516)
